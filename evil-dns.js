@@ -9,14 +9,16 @@ var dns = require('dns'),
 
 dns.lookup = function(domain, options, callback) {
 	var i;
+	var _options = options;
+	var _callback = callback;
 
 	if (arguments.length === 2) {
-		callback = options;
-		options = {};
-	} 
+		_callback = _options;
+		_options = {};
+	}
 
-    var family = (typeof(options) === 'object') ? options.family : options;
-    if (family) {
+	var family = (typeof(_options) === 'object') ? _options.family : _options;
+	if (family) {
 		family = +family;
 		if (family !== 4 && family !== 6) {
 			throw new Error('invalid argument: `family` must be 4 or 6');
@@ -27,12 +29,12 @@ dns.lookup = function(domain, options, callback) {
 		var entry = domains[i];
 		if (domain.match(entry.domain)) {
 			if (!family || family === entry.family) {
-				return callback(null, entry.ip, entry.family);
-			}			
+				return _callback(null, entry.ip, entry.family);
+			}
 		}
 	}
 
-	return dnsLookup.call(this, domain, options, callback);
+	return dnsLookup.apply(this, arguments);
 };
 
 /**
